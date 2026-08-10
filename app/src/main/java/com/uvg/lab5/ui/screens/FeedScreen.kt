@@ -17,8 +17,9 @@ package com.uvg.lab5.ui.screens
  * Recibiendo el Modifier, la misma pieza sirve con 16.dp aquí y con otro valor en la siguiente
  * pantalla sin tocar su código.
  *
- * Declaración de uso de IA: usé Claude para apoyarme en la construcción de esta pantalla.
- * Entiendo el código y puedo explicar cada decisión.
+ * Declaración de uso de IA: usé Claude (Anthropic) para generar la versión inicial
+ * de los archivos de este laboratorio, a partir del enunciado. Revisé el código,
+ * entiendo cómo funciona cada componente y puedo explicar las decisiones de diseño.
  */
 
 import androidx.compose.foundation.background
