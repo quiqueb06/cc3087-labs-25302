@@ -5,5 +5,7 @@ data class Article(
     val title: String,
     val excerpt: String,
     val readingMinutes: Int,
-    val date: String
+    val date: String,
+    val isAuthorFollowed: Boolean,
+    val isFeatured: Boolean
 )

@@ -1,5 +1,6 @@
 package com.uvg.lab5.ui.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,7 +16,8 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun FilaPestanas(
     pestanas: List<String>,
-    pestanaActiva: String,
+    selectedTab: String,
+    onTabSelected: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -24,12 +26,13 @@ fun FilaPestanas(
         verticalAlignment = Alignment.CenterVertically
     ) {
         pestanas.forEach { pestana ->
-            val activa = pestana == pestanaActiva
+            val activa = pestana == selectedTab
             Text(
                 text = pestana,
                 fontSize = 14.sp,
                 fontWeight = if (activa) FontWeight.Bold else FontWeight.Normal,
-                color = if (activa) Color(0xFF242424) else Color(0xFF6B6B6B)
+                color = if (activa) Color(0xFF242424) else Color(0xFF6B6B6B),
+                modifier = Modifier.clickable { onTabSelected(pestana) }
             )
         }
     }

@@ -56,6 +56,7 @@ fun FeedScreen(
     // Estado de interfaz: se conserva cuando Android recrea la Activity al rotar.
     var searchQuery by rememberSaveable { mutableStateOf("") }
     var showShortReadsOnly by rememberSaveable { mutableStateOf(false) }
+    var selectedTab by rememberSaveable { mutableStateOf("Para ti") }
 
     // Lista derivada: se recalcula desde la lista original y los filtros activos.
     val visibleArticles = articles.filter { article ->
@@ -63,7 +64,12 @@ fun FeedScreen(
                 article.title.contains(searchQuery, ignoreCase = true) ||
                 article.author.contains(searchQuery, ignoreCase = true)
         val matchesShortReads = !showShortReadsOnly || article.readingMinutes <= 5
-        matchesSearch && matchesShortReads
+        val matchesTab = when (selectedTab) {
+            "Siguiendo" -> article.isAuthorFollowed
+            "Destacados" -> article.isFeatured
+            else -> true
+        }
+        matchesSearch && matchesShortReads && matchesTab
     }
     val resultCount = visibleArticles.size
 
@@ -80,7 +86,8 @@ fun FeedScreen(
         Separador()
         FilaPestanas(
             pestanas = listOf("Para ti", "Siguiendo", "Destacados"),
-            pestanaActiva = "Para ti",
+            selectedTab = selectedTab,
+            onTabSelected = { selectedTab = it },
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
         )
         Separador()
