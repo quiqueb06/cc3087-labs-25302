@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
-import com.uvg.lab5.data.articulosDeEjemplo
+import com.uvg.lab5.data.sampleArticles
 import com.uvg.lab5.ui.screens.FeedScreen
 import com.uvg.lab5.ui.theme.Lab5Theme
 
@@ -20,7 +20,7 @@ class MainActivity : ComponentActivity() {
             Lab5Theme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     FeedScreen(
-                        articulos = articulosDeEjemplo,
+                        articles = sampleArticles,
                         modifier = Modifier.padding(innerPadding)
                     )
                 }

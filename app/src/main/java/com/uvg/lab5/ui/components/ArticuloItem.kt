@@ -17,11 +17,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.uvg.lab5.model.Articulo
+import com.uvg.lab5.model.Article
 
 @Composable
 fun ArticuloItem(
-    articulo: Articulo,
+    article: Article,
     colorAvatar: Color,
     colorMiniatura: Color,
     modifier: Modifier = Modifier
@@ -48,26 +48,26 @@ fun ArticuloItem(
                         .background(colorAvatar)
                 )
                 Text(
-                    text = articulo.autor,
+                    text = article.author,
                     fontSize = 12.sp,
                     color = Color(0xFF242424)
                 )
             }
             Text(
-                text = articulo.titulo,
+                text = article.title,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF242424)
             )
             Text(
-                text = articulo.extracto,
+                text = article.excerpt,
                 fontSize = 14.sp,
                 color = Color(0xFF6B6B6B)
             )
             // Row de la metadata: tiempo de lectura y fecha.
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(
-                    text = "${articulo.minutosLectura} min de lectura",
+                    text = "${article.readingMinutes} min de lectura",
                     fontSize = 12.sp,
                     color = Color(0xFF6B6B6B)
                 )
@@ -77,7 +77,7 @@ fun ArticuloItem(
                     color = Color(0xFF6B6B6B)
                 )
                 Text(
-                    text = articulo.fecha,
+                    text = article.date,
                     fontSize = 12.sp,
                     color = Color(0xFF6B6B6B)
                 )

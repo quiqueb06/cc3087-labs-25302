@@ -1,38 +1,35 @@
 package com.uvg.lab5.ui.screens
 
 /*
- * Laboratorio 5 - Ruta B
- *
- * 1. ¿Qué pasa si le quito el weight a la Column del artículo?
- * Al quitarle el weight, la Column deja de repartirse el espacio sobrante y pasa a medir
- * solo lo que necesita su contenido. Como los títulos son largos, la fila crece más allá del
- * ancho de la pantalla y la miniatura de la derecha se sale del borde o queda cortada.
- * Con weight(1f) la columna recibe lo que queda después de reservar los 80.dp de la miniatura,
- * así que el texto se acomoda y la miniatura conserva su tamaño.
- *
- * 2. ¿Por qué el componente de artículo recibe un Modifier en lugar de fijar su margen adentro?
- * Porque el margen es decisión de quien coloca el componente, no del componente mismo. Si el
- * padding estuviera escrito adentro, el artículo se vería igual en todas partes y para usarlo
- * en otra pantalla con espaciados distintos tendría que editarlo o hacer una copia.
- * Recibiendo el Modifier, la misma pieza sirve con 16.dp aquí y con otro valor en la siguiente
- * pantalla sin tocar su código.
- *
- * Declaración de uso de IA: usé Claude (Anthropic) para generar la versión inicial
- * de los archivos de este laboratorio, a partir del enunciado. Revisé el código,
- * entiendo cómo funciona cada componente y puedo explicar las decisiones de diseño.
+ * Declaración de uso de IA: usé Claude (Anthropic) como apoyo para construir esta
+ * pantalla a partir del enunciado. Revisé el código, ejecuté los experimentos en el
+ * emulador y puedo explicar cada decisión.
  */
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.uvg.lab5.data.articulosDeEjemplo
-import com.uvg.lab5.model.Articulo
+import androidx.compose.ui.unit.sp
+import com.uvg.lab5.data.sampleArticles
+import com.uvg.lab5.model.Article
 import com.uvg.lab5.ui.components.ArticuloItem
 import com.uvg.lab5.ui.components.BarraSuperior
 import com.uvg.lab5.ui.components.FilaPestanas
@@ -53,9 +50,23 @@ private val coloresMiniatura = listOf(
 
 @Composable
 fun FeedScreen(
-    articulos: List<Articulo>,
+    articles: List<Article>,
     modifier: Modifier = Modifier
 ) {
+    // Estado de interfaz: se conserva cuando Android recrea la Activity al rotar.
+    var searchQuery by rememberSaveable { mutableStateOf("") }
+    var showShortReadsOnly by rememberSaveable { mutableStateOf(false) }
+
+    // Lista derivada: se recalcula desde la lista original y los filtros activos.
+    val visibleArticles = articles.filter { article ->
+        val matchesSearch = searchQuery.isBlank() ||
+                article.title.contains(searchQuery, ignoreCase = true) ||
+                article.author.contains(searchQuery, ignoreCase = true)
+        val matchesShortReads = !showShortReadsOnly || article.readingMinutes <= 5
+        matchesSearch && matchesShortReads
+    }
+    val resultCount = visibleArticles.size
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -73,14 +84,73 @@ fun FeedScreen(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
         )
         Separador()
-        articulos.forEachIndexed { indice, articulo ->
-            ArticuloItem(
-                articulo = articulo,
-                colorAvatar = coloresAvatar[indice % coloresAvatar.size],
-                colorMiniatura = coloresMiniatura[indice % coloresMiniatura.size],
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
+        OutlinedTextField(
+            value = searchQuery,
+            onValueChange = { searchQuery = it },
+            placeholder = { Text("Buscar por título o autor") },
+            singleLine = true,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 4.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Switch(
+                    checked = showShortReadsOnly,
+                    onCheckedChange = { showShortReadsOnly = it }
+                )
+                Text(
+                    text = "Solo lecturas cortas",
+                    fontSize = 14.sp,
+                    color = Color(0xFF242424)
+                )
+            }
+            Text(
+                text = if (resultCount == 1) "1 resultado" else "$resultCount resultados",
+                fontSize = 12.sp,
+                color = Color(0xFF6B6B6B)
             )
-            Separador()
+        }
+        Separador()
+        if (visibleArticles.isEmpty()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                Text(
+                    text = "No se encontraron artículos",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF242424)
+                )
+                Text(
+                    text = "Cambia la pestaña, la búsqueda o el filtro.",
+                    fontSize = 14.sp,
+                    color = Color(0xFF6B6B6B)
+                )
+            }
+        } else {
+            visibleArticles.forEachIndexed { indice, article ->
+                ArticuloItem(
+                    article = article,
+                    colorAvatar = coloresAvatar[indice % coloresAvatar.size],
+                    colorMiniatura = coloresMiniatura[indice % coloresMiniatura.size],
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
+                )
+                Separador()
+            }
         }
     }
 }
@@ -89,6 +159,6 @@ fun FeedScreen(
 @Composable
 private fun FeedScreenPreview() {
     Lab5Theme {
-        FeedScreen(articulos = articulosDeEjemplo)
+        FeedScreen(articles = sampleArticles)
     }
 }
