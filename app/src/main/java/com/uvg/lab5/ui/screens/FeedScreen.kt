@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -57,6 +58,9 @@ fun FeedScreen(
     var searchQuery by rememberSaveable { mutableStateOf("") }
     var showShortReadsOnly by rememberSaveable { mutableStateOf(false) }
     var selectedTab by rememberSaveable { mutableStateOf("Para ti") }
+
+    // Prueba A: variable local ordinaria.
+    var applauseCount = 0
 
     // Lista derivada: se recalcula desde la lista original y los filtros activos.
     val visibleArticles = articles.filter { article ->
@@ -126,6 +130,19 @@ fun FeedScreen(
                 fontSize = 12.sp,
                 color = Color(0xFF6B6B6B)
             )
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.End
+        ) {
+            TextButton(onClick = { applauseCount++ }) {
+                Text(
+                    text = "Aplaudir · $applauseCount",
+                    fontSize = 14.sp
+                )
+            }
         }
         Separador()
         if (visibleArticles.isEmpty()) {
