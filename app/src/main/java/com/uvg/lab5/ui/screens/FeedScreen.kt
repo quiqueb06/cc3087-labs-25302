@@ -20,6 +20,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -59,8 +60,8 @@ fun FeedScreen(
     var showShortReadsOnly by rememberSaveable { mutableStateOf(false) }
     var selectedTab by rememberSaveable { mutableStateOf("Para ti") }
 
-    // Prueba A: variable local ordinaria.
-    var applauseCount = 0
+    // Prueba B: remember + mutableStateOf.
+    var applauseCount by remember { mutableStateOf(0) }
 
     // Lista derivada: se recalcula desde la lista original y los filtros activos.
     val visibleArticles = articles.filter { article ->
