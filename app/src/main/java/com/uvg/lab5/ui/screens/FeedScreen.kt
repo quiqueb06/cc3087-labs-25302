@@ -211,10 +211,40 @@ fun FeedContent(
     }
 }
 
-@Preview(showBackground = true, showSystemUi = true)
+@Preview(showBackground = true, showSystemUi = true, name = "Feed con resultados")
 @Composable
-private fun FeedScreenPreview() {
+private fun FeedContentConResultadosPreview() {
     Lab5Theme {
-        FeedScreen(articles = sampleArticles)
+        FeedContent(
+            visibleArticles = sampleArticles.filter {
+                it.title.contains("kotlin", ignoreCase = true)
+            },
+            searchQuery = "kotlin",
+            onSearchQueryChange = {},
+            showShortReadsOnly = false,
+            onShortReadsOnlyChange = {},
+            selectedTab = "Para ti",
+            onTabSelected = {},
+            applauseCount = 3,
+            onApplaud = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true, name = "Feed sin resultados")
+@Composable
+private fun FeedContentVacioPreview() {
+    Lab5Theme {
+        FeedContent(
+            visibleArticles = emptyList(),
+            searchQuery = "xyz",
+            onSearchQueryChange = {},
+            showShortReadsOnly = true,
+            onShortReadsOnlyChange = {},
+            selectedTab = "Destacados",
+            onTabSelected = {},
+            applauseCount = 3,
+            onApplaud = {}
+        )
     }
 }
