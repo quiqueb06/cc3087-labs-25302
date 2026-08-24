@@ -1,9 +1,9 @@
 package com.uvg.lab5.ui.screens
 
 /*
- * Declaración de uso de IA: usé Claude (Anthropic) como apoyo para construir esta
- * pantalla a partir del enunciado. Revisé el código, ejecuté los experimentos en el
- * emulador y puedo explicar cada decisión.
+ * Declaración de uso de IA: usé Claude (Anthropic) como apoyo para reorganizar esta
+ * pantalla según el patrón de elevación del estado. Revisé el código, verifiqué que el
+ * comportamiento no cambió y puedo explicar cada decisión.
  */
 
 import androidx.compose.foundation.background
@@ -49,17 +49,18 @@ private val coloresMiniatura = listOf(
     Color(0xFFC6E0D3)
 )
 
+/**
+ * Dueña del estado. Guarda los cuatro valores, calcula la lista visible
+ * y entrega valores y eventos a FeedContent.
+ */
 @Composable
 fun FeedScreen(
     articles: List<Article>,
     modifier: Modifier = Modifier
 ) {
-    // Estado de interfaz: se conserva cuando Android recrea la Activity al rotar.
     var searchQuery by rememberSaveable { mutableStateOf("") }
     var showShortReadsOnly by rememberSaveable { mutableStateOf(false) }
     var selectedTab by rememberSaveable { mutableStateOf("Para ti") }
-
-    // Prueba C: rememberSaveable + mutableStateOf.
     var applauseCount by rememberSaveable { mutableStateOf(0) }
 
     // Lista derivada: se recalcula desde la lista original y los filtros activos.
@@ -75,6 +76,37 @@ fun FeedScreen(
         }
         matchesSearch && matchesShortReads && matchesTab
     }
+
+    FeedContent(
+        visibleArticles = visibleArticles,
+        searchQuery = searchQuery,
+        onSearchQueryChange = { searchQuery = it },
+        showShortReadsOnly = showShortReadsOnly,
+        onShortReadsOnlyChange = { showShortReadsOnly = it },
+        selectedTab = selectedTab,
+        onTabSelected = { selectedTab = it },
+        applauseCount = applauseCount,
+        onApplaud = { applauseCount++ },
+        modifier = modifier
+    )
+}
+
+/**
+ * Sin estado. Lee los valores que recibe e informa cada evento con su callback.
+ */
+@Composable
+fun FeedContent(
+    visibleArticles: List<Article>,
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
+    showShortReadsOnly: Boolean,
+    onShortReadsOnlyChange: (Boolean) -> Unit,
+    selectedTab: String,
+    onTabSelected: (String) -> Unit,
+    applauseCount: Int,
+    onApplaud: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     val resultCount = visibleArticles.size
 
     Column(
@@ -91,13 +123,13 @@ fun FeedScreen(
         FilaPestanas(
             pestanas = listOf("Para ti", "Siguiendo", "Destacados"),
             selectedTab = selectedTab,
-            onTabSelected = { selectedTab = it },
+            onTabSelected = onTabSelected,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
         )
         Separador()
         OutlinedTextField(
             value = searchQuery,
-            onValueChange = { searchQuery = it },
+            onValueChange = onSearchQueryChange,
             placeholder = { Text("Buscar por título o autor") },
             singleLine = true,
             modifier = Modifier
@@ -117,7 +149,7 @@ fun FeedScreen(
             ) {
                 Switch(
                     checked = showShortReadsOnly,
-                    onCheckedChange = { showShortReadsOnly = it }
+                    onCheckedChange = onShortReadsOnlyChange
                 )
                 Text(
                     text = "Solo lecturas cortas",
@@ -137,7 +169,7 @@ fun FeedScreen(
                 .padding(horizontal = 16.dp),
             horizontalArrangement = Arrangement.End
         ) {
-            TextButton(onClick = { applauseCount++ }) {
+            TextButton(onClick = onApplaud) {
                 Text(
                     text = "Aplaudir · $applauseCount",
                     fontSize = 14.sp
@@ -179,10 +211,40 @@ fun FeedScreen(
     }
 }
 
-@Preview(showBackground = true, showSystemUi = true)
+@Preview(showBackground = true, showSystemUi = true, name = "Feed con resultados")
 @Composable
-private fun FeedScreenPreview() {
+private fun FeedContentConResultadosPreview() {
     Lab5Theme {
-        FeedScreen(articles = sampleArticles)
+        FeedContent(
+            visibleArticles = sampleArticles.filter {
+                it.title.contains("kotlin", ignoreCase = true)
+            },
+            searchQuery = "kotlin",
+            onSearchQueryChange = {},
+            showShortReadsOnly = false,
+            onShortReadsOnlyChange = {},
+            selectedTab = "Para ti",
+            onTabSelected = {},
+            applauseCount = 3,
+            onApplaud = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true, name = "Feed sin resultados")
+@Composable
+private fun FeedContentVacioPreview() {
+    Lab5Theme {
+        FeedContent(
+            visibleArticles = emptyList(),
+            searchQuery = "xyz",
+            onSearchQueryChange = {},
+            showShortReadsOnly = true,
+            onShortReadsOnlyChange = {},
+            selectedTab = "Destacados",
+            onTabSelected = {},
+            applauseCount = 3,
+            onApplaud = {}
+        )
     }
 }
